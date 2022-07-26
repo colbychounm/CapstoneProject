@@ -1,0 +1,46 @@
+.mainpage-header {
+    position        : relative;
+    display         : flex;
+    height          : 43px;
+    width           : 100%;
+    background-color: var(--black-color);
+    color           : var(--white-color);
+}
+
+.header-left {
+    display: flex;
+    margin : 0 20px;
+}
+
+.header-brandname,
+.header-brandlogo {
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    width           : 108px;
+    height          : 43px;
+    background-color: #444444;
+
+}
+
+.header-brandname img {
+    width: 80%;
+}
+
+.header-brandlogo {
+    width           : 70px;
+    background-color: var(--black-color);
+}
+
+.header-brandlogo img {
+    width: 80%;
+}
+
+.header-center {
+    position   : absolute;
+    left       : 0;
+    right      : 0;
+    line-height: 43px;
+    text-align : center;
+    font-size  : 13px;
+}

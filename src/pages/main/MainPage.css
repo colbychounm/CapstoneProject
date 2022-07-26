@@ -1,0 +1,39 @@
+.mainpage {
+    width: 100%;
+}
+
+.mainpage-banner {
+    position: relative;
+
+}
+
+.mainpage-banner img {
+    width: 100%;
+}
+
+.mainpage-login {
+    position : absolute;
+    left     : 50%;
+    top      : 40%;
+    transform: translateX(-50%);
+}
+
+.mainpage-input {
+    width           : 395px;
+    height          : 48px;
+    padding         : 5px 10px;
+    border          : 1px solid #dddddd;
+    background-color: #F5F5F5;
+    outline         : none;
+    color           : var(--black-color);
+    font-size       : 15px;
+}
+
+.mainpage-button {
+    width           : 100px;
+    padding         : 16px 25px;
+    margin-left     : 10px;
+    background-color: var(--black-color);
+    color           : var(--white-color);
+    cursor          : pointer;
+}
