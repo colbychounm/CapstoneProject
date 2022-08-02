@@ -14,10 +14,14 @@ function ItemInCart({
     setIsCheckoutSuccess,
     isCheckoutSuccess,
     setShowRemoveItemModal,
+    showRemoveItemModal,
     isItemRemoved,
     setIsItemRemoved,
     setIsCartAvailable,
     saveAllChanges }) {
+
+    let cartItem = {}
+    let cart = []
 
     const [queryCart] = useLazyQuery(GET_CART_ITEMS);
     const [queryProductInCart] = useLazyQuery(GET_PRODUCT);
@@ -31,10 +35,9 @@ function ItemInCart({
     const [stock, setStock] = useState([]);
     const [productsPrice, setProductsPrice] = useState([]);
     const [isSelectAllChecked, setIsSelectAllChecked] = useState(false)
-    const [isChecked, setIsChecked] = useState(false);
-
-    let cartItem = {}
-    let cart = []
+    const [checkedState, setCheckedState] = useState(
+        new Array(itemsInCart.length).fill(false)
+    );
 
     // Query item in customer's cart and detail of product 
     const queryCustomerCart = () => {
@@ -42,36 +45,44 @@ function ItemInCart({
             queryCart(
                 { variables: { customerCustomerId2: "Chau" } }
             ).then(res => {
-                setItemsInCart(res.data.customer.items)
-                resolve(res.data.customer.items)
+                // setItemsInCart(res.data.customer.items)
+                // resolve(res.data.customer.items)
 
-                // const data = res.data.customer.items
-                // let cartItem = {};
-                // let cart = []
-                // data.forEach((item) => {
-                //     cartItem = { ...item }
-                //     cart.push(cartItem)
-                // })
-                // const mergeDuplicateItems = new Promise((resolve) => {
-                //     for (let i = 0; i < cart.length; i++) {
-                //         for (let j = 1; j < cart.length; j++) {
-                //             if (cart[i].productId === cart[j].productId
-                //                 && cart[i].color === cart[j].color
-                //                 && cart[i].size === cart[j].size
-                //             ) {
-                //                 cart[j].quantity = cart[i].quantity + cart[j].quantity;
-                //                 cart.splice(i, 1)
-                //             }
-                //         }
-                //     }
-                //     resolve(cart)
-                // });
-                // mergeDuplicateItems
-                //     .then(res => {
-                //         console.log(res)
-                //         setItemsInCart(res)
-                //         resolve(res)
-                //     })
+                const resObj = {};
+                const data = res.data.customer.items;
+
+                let cartItem = {};
+                const cart = [];
+
+                const getCart = new Promise((resolve) => {
+                    data.forEach((item) => {
+                        cartItem = { ...item }
+                        cart.push(cartItem)
+                    })
+                    resolve(cart)
+                })
+                getCart.then(res => {
+                    res.forEach((item) => {
+                        if (!resObj[item.productId]) {
+                            resObj[item.productId] = []
+                        }
+                        resObj[item.productId].push(item)
+                    })
+                }).then(() => {
+                    const itemsArray = Object.values(resObj);
+
+                    const result = itemsArray.map((item) => {
+                        const res = item.reduce((prev, curr) => {
+                            return {
+                                ...curr,
+                                quantity: curr.quantity + prev.quantity
+                            }
+                        }, { quantity: 0 })
+                        return res
+                    })
+                    setItemsInCart(result)
+                    resolve(result)
+                })
             })
         })
 
@@ -104,11 +115,10 @@ function ItemInCart({
     //Create array of cartItem object that have detail product
     if (itemsInCart) {
         itemsInCart.forEach((item, index) => {
-            cartItem = { ...item, product: detailProducts[index] }
-            cart.push(cartItem)
+            cartItem = { ...item, product: detailProducts[index] };
+            cart.push(cartItem);
         })
     }
-
 
     //Decrease quantity of item
     const handleDecrease = (index) => {
@@ -120,48 +130,8 @@ function ItemInCart({
             setQuantity(newQuantityArray)
             setShowRemoveItemModal(true)
         }
-        // const decreaseQuantity = new Promise((resolve) => {
-        //     newQuantityArray[index]--
-        //     setQuantity(newQuantityArray)
-        //     if (newQuantityArray[index] <= 0) {
-        //         newQuantityArray[index] = 0;
-        //         setQuantity(newQuantityArray)
-        //         setShowRemoveItemModal(true)
-        //     }
-        //     resolve(isItemRemoved)
-        // })
-        // //Remove item out of cart if quantity is set to 0 and customer click remove button
-        // decreaseQuantity
-        //     .then(res => {
-        //         console.log("Res", res)
-        //         if (res === true) {
-        //             console.log("here")
-        //             const cartAfterRemove = [];
-        //             cart.forEach((item, itemIndex) => {
-        //                 if (index !== itemIndex) {
-        //                     const itemInCartAfterRemove = {
-        //                         productId: `${item.productId}`,
-        //                         color: `${item.color}`,
-        //                         quantity: quantity[itemIndex]
-        //                     }
-        //                     cartAfterRemove.push(itemInCartAfterRemove)
-        //                 }
-
-        //             })
-        //             updateAllChanges({
-        //                 variables: {
-        //                     customer: {
-        //                         customerId: "Chau",
-        //                         items: cartAfterRemove
-        //                     }
-        //                 }
-        //             })
-        //         } else {
-        //             newQuantityArray[index] = 1;
-        //             setQuantity(newQuantityArray)
-        //         }
-        //     })
     }
+
 
     //Increase quantity of item
     const handleIncrease = (index) => {
@@ -174,17 +144,22 @@ function ItemInCart({
         setQuantity(newQuantityArray)
     }
 
+    //Select all items in cart
     const handleSelectAll = () => {
         setIsSelectAllChecked(!isSelectAllChecked)
-        handleSelect();
+        const array = new Array(itemsInCart.length).fill(true)
+        setCheckedState(array);
+        if (isSelectAllChecked) {
+            setCheckedState([]);
+        }
     }
 
-    const handleSelect = () => {
-        setIsChecked(!isChecked)
-        if (isSelectAllChecked) {
-            setIsChecked(!isChecked)
-            // setIsSelectAllChecked(!isSelectAllChecked)
-        }
+    //Select item in cart
+    const handleOnChange = (position) => {
+        const updatedCheckedState = checkedState.map((item, index) =>
+            index === position ? !item : item
+        );
+        setCheckedState(updatedCheckedState)
     }
 
     //Query customer cart
@@ -241,7 +216,7 @@ function ItemInCart({
     return (
         <>
             <h4 className='checkout-form__title'>
-                <input onChange={handleSelectAll} checked={isSelectAllChecked} className='item-checkbox' type="checkbox" />
+                <input onChange={handleSelectAll} checked={isSelectAllChecked} value={isSelectAllChecked || false} className='item-checkbox' type="checkbox" />
                 Select All
             </h4>
             {
@@ -249,7 +224,7 @@ function ItemInCart({
                     if (item.product) {
                         return (
                             <div key={index} className="cart-item">
-                                <input onChange={handleSelect} checked={isChecked} className='item-checkbox' type="checkbox" />
+                                <input onChange={() => handleOnChange(index)} checked={checkedState[index]} value={checkedState[index] || false} className='item-checkbox' type="checkbox" />
                                 <div className="item-img">
                                     <img alt="Product" src={item.product.pictures[0]} />
                                 </div>

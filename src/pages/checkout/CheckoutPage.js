@@ -41,6 +41,7 @@ function CheckoutPage() {
                                     setIsLocationUpdate={setIsLocationUpdate}
                                     isLocationUpdate={isLocationUpdate}
                                     setShowRemoveItemModal={setShowRemoveItemModal}
+                                    showRemoveItemModal={showRemoveItemModal}
                                     isItemRemoved={isItemRemoved}
                                     setIsItemRemoved={setIsItemRemoved}
                                     setIsCartAvailable={setIsCartAvailable}
