@@ -45,9 +45,6 @@ function ItemInCart({
             queryCart(
                 { variables: { customerCustomerId2: "Chau" } }
             ).then(res => {
-                // setItemsInCart(res.data.customer.items)
-                // resolve(res.data.customer.items)
-
                 const resObj = {};
                 const data = res.data.customer.items;
 
@@ -131,7 +128,6 @@ function ItemInCart({
             setShowRemoveItemModal(true)
         }
     }
-
 
     //Increase quantity of item
     const handleIncrease = (index) => {
@@ -254,6 +250,7 @@ function ItemInCart({
                 isLocationUpdate={isLocationUpdate}
                 setIsLocationUpdate={setIsLocationUpdate}
                 setIsCartAvailable={setIsCartAvailable}
+                checkedState={checkedState}
             />
         </>
     )

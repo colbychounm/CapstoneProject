@@ -10,7 +10,8 @@ function CartTotalPrice({
     quantity,
     isLocationUpdate,
     setIsLocationUpdate,
-    setIsCartAvailable
+    setIsCartAvailable,
+    checkedState
 }) {
     const [shipping, setShipping] = useState(0);
     const [tax, setTax] = useState(0);
@@ -18,14 +19,29 @@ function CartTotalPrice({
     const [queryFee] = useLazyQuery(GET_FEE)
     const [queryCustomer] = useLazyQuery(GET_CUSTOMER)
 
+    const productsPriceSelected = [...productsPrice];
+
+    //Set product price (only selected item will be counted in subtotal)
+    if (checkedState.length === 0) {
+        productsPriceSelected.fill(0)
+    } else {
+        checkedState.forEach((value, index) => {
+            if (value === false) {
+                productsPriceSelected[index] = 0;
+            }
+        })
+    }
+
     //Calculate subtotal price of items in cart
     const subtotalPrice = useMemo(() => {
-        const sumPrice = productsPrice.reduce(
+        console.log(productsPriceSelected)
+        console.log(checkedState)
+        const sumPrice = productsPriceSelected.reduce(
             (previousValue, currentValue, currentIndex) => {
                 return previousValue + currentValue * quantity[currentIndex]
             }, 0);
         return sumPrice
-    }, [productsPrice, quantity])
+    }, [productsPriceSelected, quantity])
 
     const totalTax = useMemo(() => {
         return tax * subtotalPrice
