@@ -34,8 +34,6 @@ function CartTotalPrice({
 
     //Calculate subtotal price of items in cart
     const subtotalPrice = useMemo(() => {
-        console.log(productsPriceSelected)
-        console.log(checkedState)
         const sumPrice = productsPriceSelected.reduce(
             (previousValue, currentValue, currentIndex) => {
                 return previousValue + currentValue * quantity[currentIndex]

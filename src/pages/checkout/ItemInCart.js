@@ -34,10 +34,8 @@ function ItemInCart({
     const [quantity, setQuantity] = useState([]);
     const [stock, setStock] = useState([]);
     const [productsPrice, setProductsPrice] = useState([]);
-    const [isSelectAllChecked, setIsSelectAllChecked] = useState(false)
-    const [checkedState, setCheckedState] = useState(
-        new Array(itemsInCart.length).fill(false)
-    );
+    const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
+    const [checkedState, setCheckedState] = useState([]);
 
     // Query item in customer's cart and detail of product 
     const queryCustomerCart = () => {
@@ -140,23 +138,46 @@ function ItemInCart({
         setQuantity(newQuantityArray)
     }
 
-    //Select all items in cart
-    const handleSelectAll = () => {
-        setIsSelectAllChecked(!isSelectAllChecked)
-        const array = new Array(itemsInCart.length).fill(true)
-        setCheckedState(array);
-        if (isSelectAllChecked) {
-            setCheckedState([]);
-        }
-    }
+    //Set checked state after query items in cart
+    useEffect(() => {
+        setCheckedState(new Array(itemsInCart.length).fill(true))
+    }, [itemsInCart])
 
     //Select item in cart
-    const handleOnChange = (position) => {
-        const updatedCheckedState = checkedState.map((item, index) =>
-            index === position ? !item : item
-        );
-        setCheckedState(updatedCheckedState)
+    const toggleCheck = (position) => {
+        setCheckedState((prevState) => {
+            const newState = [...prevState];
+            newState[position] = !prevState[position];
+            return newState;
+        });
     }
+
+    //Select all items in cart
+    const handleSelectAll = (value) => {
+        setIsSelectAllChecked(value)
+        setCheckedState((prevState) => {
+            const newState = [...prevState];
+            for (const index in newState) {
+                newState[index] = value;
+            }
+            return newState;
+        });
+    }
+
+    //Handle select all state when deselect an item
+    useEffect(() => {
+        let allChecked = true;
+        for (const index in checkedState) {
+            if (checkedState[index] === false) {
+                allChecked = false;
+            }
+        }
+        if (allChecked) {
+            setIsSelectAllChecked(true);
+        } else {
+            setIsSelectAllChecked(false);
+        }
+    }, [checkedState]);
 
     //Query customer cart
     useEffect(() => {
@@ -165,22 +186,73 @@ function ItemInCart({
 
     //Checkout and edit product's stock
     useEffect(() => {
-        if (itemsInCart) {
-            itemsInCart.forEach(async (item, index) => {
-                await updateProductStock({
-                    variables: {
-                        updateProductProduct2: {
-                            id: `${item.productId}`,
-                            stock: stock[index] - quantity[index]
-                        }
-                    }
-                })
-            })
-        }
         if (isCheckoutSuccess) {
-            emptyCart({
-                variables: { emptyCartCustomerId2: "Chau" }
-            })
+            if (itemsInCart) {
+                const itemsCheckout = [];
+                const itemsRemainInCart = [];
+                const itemsCheckoutStock = [];
+                const itemsCheckoutQuantity = [];
+                const itemsRemainQuantity = [];
+
+                const handleUpdateStock = new Promise((resolve) => {
+                    checkedState.forEach((value, index) => {
+                        if (value === false) {
+                            itemsRemainInCart.push(itemsInCart[index]);
+                            itemsRemainQuantity.push(quantity[index])
+                        } else {
+                            itemsCheckout.push(itemsInCart[index]);
+                            itemsCheckoutStock.push(stock[index]);
+                            itemsCheckoutQuantity.push(quantity[index]);
+                        }
+                    })
+                    resolve([itemsRemainInCart, itemsRemainQuantity, itemsCheckout, itemsCheckoutStock, itemsCheckoutQuantity])
+                })
+                handleUpdateStock.then(res => {
+                    const itemsRemainInCart = res[0];
+                    const itemsRemainQuantity = res[1];
+                    const itemsCheckout = res[2];
+                    const itemsCheckoutStock = res[3];
+                    const itemsCheckoutQuantity = res[4];
+
+                    itemsCheckout.forEach(async (item, index) => {
+                        await updateProductStock({
+                            variables: {
+                                updateProductProduct2: {
+                                    id: `${item.productId}`,
+                                    stock: itemsCheckoutStock[index] - itemsCheckoutQuantity[index]
+                                }
+                            }
+                        })
+                    })
+                    return [itemsRemainInCart, itemsRemainQuantity]
+                }).then((res) => {
+                    console.log(res[0])
+                    console.log(res[1])
+                    const cartAfterSave = [];
+                    res[0].forEach((item, index) => {
+                        const itemInCartAfterSave = {
+                            productId: `${item.productId}`,
+                            color: `${item.color}`,
+                            size: `${item.size}`,
+                            quantity: res[1][index]
+                        }
+                        cartAfterSave.push(itemInCartAfterSave)
+                    })
+                    updateAllChanges({
+                        variables: {
+                            customer: {
+                                customerId: "Chau",
+                                items: cartAfterSave
+                            },
+                        }
+                    })
+                })
+
+            }
+
+            // emptyCart({
+            //     variables: { emptyCartCustomerId2: "Chau" }
+            // })
         }
         setIsCheckoutSuccess(false)
     }, [isCheckoutSuccess])
@@ -212,7 +284,7 @@ function ItemInCart({
     return (
         <>
             <h4 className='checkout-form__title'>
-                <input onChange={handleSelectAll} checked={isSelectAllChecked} value={isSelectAllChecked || false} className='item-checkbox' type="checkbox" />
+                <input checked={isSelectAllChecked} onChange={e => handleSelectAll(e.target.checked)} className='item-checkbox' type="checkbox" />
                 Select All
             </h4>
             {
@@ -220,7 +292,7 @@ function ItemInCart({
                     if (item.product) {
                         return (
                             <div key={index} className="cart-item">
-                                <input onChange={() => handleOnChange(index)} checked={checkedState[index]} value={checkedState[index] || false} className='item-checkbox' type="checkbox" />
+                                <input name={index} onChange={() => toggleCheck(index)} checked={checkedState[index]} className='item-checkbox' type="checkbox" />
                                 <div className="item-img">
                                     <img alt="Product" src={item.product.pictures[0]} />
                                 </div>

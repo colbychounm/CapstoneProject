@@ -8,7 +8,7 @@ function CheckoutNav({ setIsCheckoutSuccess, isCartAvailable, setShowModal }) {
 
     const handleCheckout = () => {
         if (isCartAvailable) {
-            checkoutRef.current.setAttribute("href", "/checkout-success");
+            // checkoutRef.current.setAttribute("href", "/checkout-success");
             setIsCheckoutSuccess(true)
         }
     }
