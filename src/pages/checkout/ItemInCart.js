@@ -1,5 +1,5 @@
 import { useLazyQuery, useMutation } from '@apollo/client';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { GET_CART_ITEMS } from '../../data/queries/get-cart';
 import { GET_PRODUCT } from '../../data/queries/get-product';
@@ -7,6 +7,7 @@ import { MUTATION_PRODUCT } from '../../data/mutations/update-product';
 import { MUTATION_CUSTOMER } from '../../data/mutations/update-customer';
 import { EMPTY_CART } from '../../data/mutations/empty-cart';
 import CartTotalPrice from './CartTotalPrice';
+import { CustomerId } from '../../App.js';
 
 function ItemInCart({
     isLocationUpdate,
@@ -22,6 +23,9 @@ function ItemInCart({
 
     let cartItem = {}
     let cart = []
+
+    const [customerId, setCustomerId] = useContext(CustomerId)
+    console.log("context", customerId)
 
     const [queryCart] = useLazyQuery(GET_CART_ITEMS);
     const [queryProductInCart] = useLazyQuery(GET_PRODUCT);
