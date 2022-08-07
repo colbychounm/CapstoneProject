@@ -1,13 +1,13 @@
 import { useLazyQuery, useMutation } from '@apollo/client';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { GET_CART_ITEMS } from '../../data/queries/get-cart';
 import { GET_PRODUCT } from '../../data/queries/get-product';
 import { MUTATION_PRODUCT } from '../../data/mutations/update-product';
 import { MUTATION_CUSTOMER } from '../../data/mutations/update-customer';
-import { EMPTY_CART } from '../../data/mutations/empty-cart';
+// import { EMPTY_CART } from '../../data/mutations/empty-cart';
 import CartTotalPrice from './CartTotalPrice';
-import { CustomerId } from '../../App.js';
+import { customerId } from '../main/MainPage';
 
 function ItemInCart({
     isLocationUpdate,
@@ -24,13 +24,10 @@ function ItemInCart({
     let cartItem = {}
     let cart = []
 
-    const [customerId, setCustomerId] = useContext(CustomerId)
-    console.log("context", customerId)
-
     const [queryCart] = useLazyQuery(GET_CART_ITEMS);
     const [queryProductInCart] = useLazyQuery(GET_PRODUCT);
     const [updateProductStock] = useMutation(MUTATION_PRODUCT);
-    const [emptyCart] = useMutation(EMPTY_CART)
+    // const [emptyCart] = useMutation(EMPTY_CART)
     const [updateAllChanges] = useMutation(MUTATION_CUSTOMER);
 
     const [itemsInCart, setItemsInCart] = useState([]);
@@ -45,7 +42,7 @@ function ItemInCart({
     const queryCustomerCart = () => {
         const promiseQueryCart = new Promise((resolve) => {
             queryCart(
-                { variables: { customerCustomerId2: "Chau" } }
+                { variables: { customerCustomerId2: customerId } }
             ).then(res => {
                 const resObj = {};
                 const data = res.data.customer.items;
@@ -62,10 +59,10 @@ function ItemInCart({
                 })
                 getCart.then(res => {
                     res.forEach((item) => {
-                        if (!resObj[item.productId]) {
-                            resObj[item.productId] = []
+                        if (!resObj[`${item.productId}` + `${item.color}` + `${item.size}`]) {
+                            resObj[`${item.productId}` + `${item.color}` + `${item.size}`] = []
                         }
-                        resObj[item.productId].push(item)
+                        resObj[`${item.productId}` + `${item.color}` + `${item.size}`].push(item)
                     })
                 }).then(() => {
                     const itemsArray = Object.values(resObj);
@@ -119,15 +116,56 @@ function ItemInCart({
         })
     }
 
+    //Query customer cart
+    useEffect(() => {
+        queryCustomerCart()
+    }, [])
+
     //Decrease quantity of item
     const handleDecrease = (index) => {
         const newQuantityArray = [...quantity]
+
         newQuantityArray[index]--
         setQuantity(newQuantityArray)
         if (newQuantityArray[index] <= 0) {
             newQuantityArray[index] = 0;
             setQuantity(newQuantityArray)
             setShowRemoveItemModal(true)
+            if (showRemoveItemModal === false) {
+                //Remove item out of cart if quantity is set to 0 and customer click remove button
+                if (isItemRemoved === true) {
+                    console.log("here")
+                    const cartAfterRemove = [];
+                    cart.forEach((item, itemIndex) => {
+                        if (index !== itemIndex) {
+                            const itemInCartAfterRemove = {
+                                productId: item.productId,
+                                color: item.color,
+                                quantity: quantity[itemIndex]
+                            }
+                            cartAfterRemove.push(itemInCartAfterRemove)
+                        }
+
+                    })
+                    updateAllChanges({
+                        variables: {
+                            customer: {
+                                customerId: customerId,
+                                items: cartAfterRemove
+                            }
+                        }
+                    }).then(() => {
+                        queryCart({
+                            variables: { customerCustomerId2: customerId },
+                            // fetchPolicy: 'cache-and-network'
+                        })
+                    })
+                    setIsItemRemoved(false)
+                } else {
+                    newQuantityArray[index] = 1;
+                    setQuantity(newQuantityArray)
+                }
+            }
         }
     }
 
@@ -183,11 +221,6 @@ function ItemInCart({
         }
     }, [checkedState]);
 
-    //Query customer cart
-    useEffect(() => {
-        queryCustomerCart()
-    }, [])
-
     //Checkout and edit product's stock
     useEffect(() => {
         if (isCheckoutSuccess) {
@@ -222,7 +255,7 @@ function ItemInCart({
                         await updateProductStock({
                             variables: {
                                 updateProductProduct2: {
-                                    id: `${item.productId}`,
+                                    id: item.productId,
                                     stock: itemsCheckoutStock[index] - itemsCheckoutQuantity[index]
                                 }
                             }
@@ -230,14 +263,12 @@ function ItemInCart({
                     })
                     return [itemsRemainInCart, itemsRemainQuantity]
                 }).then((res) => {
-                    console.log(res[0])
-                    console.log(res[1])
                     const cartAfterSave = [];
                     res[0].forEach((item, index) => {
                         const itemInCartAfterSave = {
-                            productId: `${item.productId}`,
-                            color: `${item.color}`,
-                            size: `${item.size}`,
+                            productId: item.productId,
+                            color: item.color,
+                            size: item.size,
                             quantity: res[1][index]
                         }
                         cartAfterSave.push(itemInCartAfterSave)
@@ -245,18 +276,13 @@ function ItemInCart({
                     updateAllChanges({
                         variables: {
                             customer: {
-                                customerId: "Chau",
+                                customerId: customerId,
                                 items: cartAfterSave
                             },
                         }
                     })
                 })
-
             }
-
-            // emptyCart({
-            //     variables: { emptyCartCustomerId2: "Chau" }
-            // })
         }
         setIsCheckoutSuccess(false)
     }, [isCheckoutSuccess])
@@ -267,9 +293,9 @@ function ItemInCart({
             const cartAfterSave = [];
             cart.forEach((item, index) => {
                 const itemInCartAfterSave = {
-                    productId: `${item.productId}`,
-                    color: `${item.color}`,
-                    size: `${item.size}`,
+                    productId: item.productId,
+                    color: item.color,
+                    size: item.size,
                     quantity: quantity[index]
                 }
                 cartAfterSave.push(itemInCartAfterSave)
@@ -277,7 +303,7 @@ function ItemInCart({
             updateAllChanges({
                 variables: {
                     customer: {
-                        customerId: "Chau",
+                        customerId: customerId,
                         items: cartAfterSave
                     },
                 }

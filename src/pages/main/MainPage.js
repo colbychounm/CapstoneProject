@@ -3,21 +3,20 @@ import Header from '../../common/Header';
 import NavBar from '../../common/NavBar';
 import Newsletter from '../../common/Newsletter';
 import Footer from '../../common/Footer';
-import { CustomerId } from '../../App.js';
+import { GET_CUSTOMER } from '../../data/queries/get-customer';
+import { MUTATION_CUSTOMER } from '../../data/mutations/update-customer';
 
-import React, { useRef, useState, useContext, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { useLazyQuery, useMutation } from '@apollo/client';
 
-// export const CustomerId = React.createContext('');
+export const customerId = localStorage.getItem("CustomerId");
 
 function MainPage() {
-    const [customerId, setCustomerId] = useContext(CustomerId)
-
-    useEffect(() => {
-        console.log(customerId)
-    }, [customerId])
+    const [queryCustomer] = useLazyQuery(GET_CUSTOMER);
+    const [updateCustomer] = useMutation(MUTATION_CUSTOMER);
 
     const [input, setInput] = useState('');
-    // const [customerId, setCustomerId] = useState('');
+    const [customerId, setCustomerId] = useState('');
     const inputRef = useRef();
 
     const handleGetCustomerId = () => {
@@ -27,8 +26,16 @@ function MainPage() {
             alert("Welcome!")
         }, 500)
     }
+
+    useEffect(() => {
+        localStorage.setItem("CustomerId", customerId)
+        queryCustomer({
+            variables: { customerCustomerId2: customerId }
+        })
+    }, [customerId])
+
+
     return (
-        // <CustomerId.Provider value={customerId}>
         <div className="mainpage">
             <Header />
             <NavBar />
@@ -42,7 +49,6 @@ function MainPage() {
             <Newsletter />
             <Footer />
         </div>
-        // </CustomerId.Provider>
     )
 }
 

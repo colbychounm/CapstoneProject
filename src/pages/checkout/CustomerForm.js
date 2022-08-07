@@ -5,6 +5,7 @@ import { useLazyQuery, useMutation } from '@apollo/client';
 import './CheckoutPage.css';
 import { GET_CUSTOMER } from '../../data/queries/get-customer';
 import { MUTATION_CUSTOMER } from '../../data/mutations/update-customer';
+import { customerId } from '../main/MainPage';
 
 const CustomerForm = ({ setIsLocationUpdate }) => {
     const [queryCustomer, { data }] = useLazyQuery(GET_CUSTOMER);
@@ -12,7 +13,7 @@ const CustomerForm = ({ setIsLocationUpdate }) => {
 
     useEffect(() => {
         queryCustomer({
-            variables: { customerCustomerId2: "Chau" }
+            variables: { customerCustomerId2: customerId }
         })
     }, [])
 
@@ -28,7 +29,7 @@ const CustomerForm = ({ setIsLocationUpdate }) => {
         </div>
         <h4 className='checkout-form__title'>Contact information</h4>
         <Formik
-            initialValues={{ name: `${customerName}`, location: `${customerLocation}` }}
+            initialValues={{ name: customerName, location: customerLocation }}
             validate={values => {
                 const errors = {};
                 if (!values.name) {
@@ -46,9 +47,9 @@ const CustomerForm = ({ setIsLocationUpdate }) => {
                 updateCustomer({
                     variables: {
                         customer: {
-                            customerId: "Chau",
-                            name: `${values.name}`,
-                            location: `${values.location}`
+                            customerId: customerId,
+                            name: values.name,
+                            location: values.location
                         }
                     }
                 })

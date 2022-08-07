@@ -4,6 +4,7 @@ import { useLazyQuery } from '@apollo/client';
 import './CheckoutPage.css';
 import { GET_FEE } from '../../data/queries/get-fee';
 import { GET_CUSTOMER } from '../../data/queries/get-customer';
+import { customerId } from '../main/MainPage';
 
 function CartTotalPrice({
     productsPrice,
@@ -51,7 +52,7 @@ function CartTotalPrice({
     //Query shipping fee and tax
     useEffect(() => {
         queryCustomer({
-            variables: { customerCustomerId2: "Chau" },
+            variables: { customerCustomerId2: `${customerId}` },
             fetchPolicy: 'cache-and-network'
         }).then(res => {
             queryFee({
