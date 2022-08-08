@@ -1,70 +1,134 @@
-import { useQuery } from '@apollo/client';
-import { useState } from 'react';
-// import { useEffect } from 'react';
+import CartTotalPrice from './CartTotalPrice';
 
-import { GET_CART_ITEMS } from '../../data/queries/get-cart';
+import { useEffect, useState } from 'react';
 
-function ItemInCart() {
-    // const [priceItem, setPriceItem] = useState(30);
-    const [quantity, setQuantity] = useState(0);
-    const { loading, error, data } = useQuery(GET_CART_ITEMS);
+function ItemInCart({
+    cart,
+    itemsInCart,
+    quantity,
+    productsPrice,
+    checkedState,
+    setCheckedState,
+    isLocationUpdate,
+    setIsLocationUpdate,
+    setIsCartAvailable,
+    stock,
+    setQuantity,
+    setShowRemoveItemModal,
+    setSelectIndex }) {
+    const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error :(</p>;
+    //Set checked state after query items in cart
+    useEffect(() => {
+        setCheckedState(new Array(itemsInCart.length).fill(true))
+    }, [itemsInCart])
 
-    // data?.customer?.items.map((item) => {
-    //     const { loading, error, data } = useQuery(GET_ITEM);
-    //     console.log(data)
-    // })
+    //Select item in cart
+    const toggleCheck = (position) => {
+        setCheckedState((prevState) => {
+            const newState = [...prevState];
+            newState[position] = !prevState[position];
+            return newState;
+        });
+    }
 
-    const handleDecreaseQuantity = (quantity) => {
-        if (quantity <= 0) {
-            quantity = 0
+    //Select all items in cart
+    const handleSelectAll = (value) => {
+        setIsSelectAllChecked(value)
+        setCheckedState((prevState) => {
+            const newState = [...prevState];
+            for (const index in newState) {
+                newState[index] = value;
+            }
+            return newState;
+        });
+    }
+
+    //Handle select all state when deselect an item
+    useEffect(() => {
+        let allChecked = true;
+        for (const index in checkedState) {
+            if (checkedState[index] === false) {
+                allChecked = false;
+            }
+        }
+        if (allChecked) {
+            setIsSelectAllChecked(true);
         } else {
-            quantity -= quantity
-            setQuantity(quantity)
+            setIsSelectAllChecked(false);
+        }
+    }, [checkedState]);
+
+    //Increase quantity of item
+    const handleIncrease = (index) => {
+        const newQuantityArray = [...quantity]
+        newQuantityArray[index]++
+        if (newQuantityArray[index] > stock[index]) {
+            newQuantityArray[index] = stock[index]
+            setQuantity(newQuantityArray)
+        }
+        setQuantity(newQuantityArray)
+    }
+
+    //Decrease quantity of item
+    const handleDecrease = (index) => {
+        setSelectIndex(index)
+        const newQuantityArray = [...quantity]
+
+        newQuantityArray[index]--
+        setQuantity(newQuantityArray)
+        if (newQuantityArray[index] <= 0) {
+            newQuantityArray[index] = 0;
+            setQuantity(newQuantityArray)
+            setShowRemoveItemModal(true)
         }
     }
 
-    const handleIncreaseQuantity = (quantity) => {
-        if (quantity <= 0) {
-            quantity = 0
-        } else {
-            quantity += quantity
-            setQuantity(quantity)
-        }
-    }
-
-    console.log(data.customer.items)
-    return data?.customer?.items ? (
-        data.customer.items.map((item, index) => {
-            // setQuantity(item.quantity)
-            return (
-                <div key={index} className="cart-item">
-                    <div className="item-img">
-                        <img alt="Product" src="https://cdn.shopify.com/s/files/1/0098/0202/2971/products/00A7914_small.jpg?v=1576726183" />
-                    </div>
-                    <div className="item-detail">
-                        <h5>Grey Knit Nylon Jacket</h5>
-                        <div className="item-variation">
-                            <p>{item.size}</p>
-                            <p>{item.color}</p>
-                        </div>
-                    </div>
-                    <div className="item-quantity-price">
-                        <div className="quantity-buttons">
-                            <button onClick={() => handleDecreaseQuantity(quantity)}>-</button>
-                            <p className="item-quantity">{item.quantity}</p>
-                            <button onClick={() => handleIncreaseQuantity(quantity)}>+</button>
-                        </div>
-                        <h5>$30</h5>
-                    </div>
-                </div>
-            )
-        })
+    return (
+        <>
+            <h4 className='checkout-form__title'>
+                <input checked={isSelectAllChecked} onChange={e => handleSelectAll(e.target.checked)} className='item-checkbox' type="checkbox" />
+                Select All
+            </h4>
+            {
+                cart.map((item, index) => {
+                    if (item.product) {
+                        return (
+                            <div key={index} className="cart-item">
+                                <input name={index} onChange={() => toggleCheck(index)} checked={checkedState[index]} className='item-checkbox' type="checkbox" />
+                                <div className="item-img">
+                                    <img alt="Product" src={item.product.pictures[0]} />
+                                </div>
+                                <div className="item-detail">
+                                    <h5>{item.product.name}</h5>
+                                    <div className="item-variation">
+                                        <p>{item.size}</p>
+                                        <p>{item.color}</p>
+                                    </div>
+                                </div>
+                                <div className="item-quantity-price">
+                                    <div className="quantity-buttons">
+                                        <button onClick={() => handleDecrease(index)}>-</button>
+                                        <p className="item-quantity">{quantity[index]}</p>
+                                        <button onClick={() => handleIncrease(index)}>+</button>
+                                    </div>
+                                    <h5 className="item-price">${productsPrice[index] * quantity[index]}</h5>
+                                </div>
+                            </div>
+                        )
+                    }
+                })
+            }
+            <CartTotalPrice
+                quantity={quantity}
+                productsPrice={productsPrice}
+                checkedState={checkedState}
+                isLocationUpdate={isLocationUpdate}
+                setIsLocationUpdate={setIsLocationUpdate}
+                setIsCartAvailable={setIsCartAvailable}
+            />
+        </>
     )
-        :
-        <></>
 }
 
 export default ItemInCart;
