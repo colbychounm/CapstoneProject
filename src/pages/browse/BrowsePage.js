@@ -6,35 +6,9 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import '../browse/BrowsePage.css'
 import { Link, useHref, useNavigate } from "react-router-dom";
 import Slider from "@material-ui/core/Slider"
-
-const GET_PRODUCTS = gql`
- query {
-    products {
-      id
-      name
-      price
-      stock
-      colors {
-        name
-        hexValue
-      }
-      description
-      categories
-      pictures
-      sizes
-      featuringFrom
-      featuringTo
-    }
-  }
-`
-
-export const ADD_TO_CART = gql`
-    mutation AddItemToCart($customerId: ID!, $item: CartItemInput!) {
-        addItemToCart(customerId: $customerId, item: $item) {
-        id
-        }
-    }
-`
+import { GET_PRODUCTS } from '../../data/queries/get-products';
+import { ADD_TO_CART } from '../../data/mutations/add-to-cart';
+import { customerId } from '../main/MainPage';
 
 function BrowsePage() {
     // Add variables
@@ -69,7 +43,7 @@ function BrowsePage() {
     const handleSubmit = useCallback((sz, clrs, id) => {
         mutate({
             variables: {
-                customerId: "Daisy-0601",
+                customerId: customerId,
                 item: {
                     productId: id,
                     color: clrs[0].name,

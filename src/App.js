@@ -15,12 +15,9 @@ function App() {
       <Routes>
         <Route path='' element={<MainPage />} />
         <Route path='owner' element={<OwnerPage />} />
-        <Route path='customer' element={<BrowsePage />} >
-        </Route>
+        <Route path='customer' element={<BrowsePage />} />
         <Route path='product-detail/:id' element={<ProductDetail />} />
-        <Route path='checkout'
-          element={<CheckoutPage />}
-        />
+        <Route path='checkout' element={<CheckoutPage />} />
         <Route path='checkout-success' element={<CheckoutSuccess />} />
       </Routes>
     </BrowserRouter>

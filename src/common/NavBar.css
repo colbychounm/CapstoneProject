@@ -13,6 +13,11 @@
     width: 210px;
 }
 
+.navbar-left {
+    display: flex;
+    gap    : 20px;
+}
+
 .navbar-center {
     display        : flex;
     align-items    : center;
