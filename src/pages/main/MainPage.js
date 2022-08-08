@@ -3,6 +3,7 @@ import Header from '../../common/Header';
 import NavBar from '../../common/NavBar';
 import Newsletter from '../../common/Newsletter';
 import Footer from '../../common/Footer';
+import { Outlet } from 'react-router-dom'
 
 function MainPage() {
     return (
@@ -18,6 +19,7 @@ function MainPage() {
             </div>
             <Newsletter />
             <Footer />
+            <Outlet/>
         </div>
     )
 }
