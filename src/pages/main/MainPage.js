@@ -3,6 +3,7 @@ import Header from '../../common/Header';
 import NavBar from '../../common/NavBar';
 import Newsletter from '../../common/Newsletter';
 import Footer from '../../common/Footer';
+import { Outlet } from 'react-router-dom'
 import { GET_CUSTOMER } from '../../data/queries/get-customer';
 // import { MUTATION_CUSTOMER } from '../../data/mutations/update-customer';
 
@@ -47,6 +48,7 @@ function MainPage() {
             </div>
             <Newsletter />
             <Footer />
+            <Outlet/>
         </div>
     )
 }

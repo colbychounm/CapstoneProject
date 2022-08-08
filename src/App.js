@@ -16,8 +16,8 @@ function App() {
         <Route path='' element={<MainPage />} />
         <Route path='owner' element={<OwnerPage />} />
         <Route path='customer' element={<BrowsePage />} >
-          <Route path='product-detail' element={<ProductDetail />} />
         </Route>
+        <Route path='product-detail/:id' element={<ProductDetail />} />
         <Route path='checkout'
           element={<CheckoutPage />}
         />
