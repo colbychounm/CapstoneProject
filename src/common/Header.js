@@ -11,7 +11,7 @@ function Header() {
                     <img alt="Teacap" src="//cdn.shopify.com/s/files/1/0098/0202/2971/files/toecap-logo-white_356c8bec-f9a2-4cf9-9385-5e60c9db9d72_large.png?v=1553806137" />
                 </span>
             </span>
-            <p className="header-center">FREE SHIPPING ON ALL ORDERS OVER $100</p>
+            <p className="header-center">HAPPY BLACK FRIDAY</p>
         </header>
     )
 }

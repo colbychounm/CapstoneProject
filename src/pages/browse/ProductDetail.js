@@ -5,7 +5,7 @@ import Footer from '../../common/Footer';
 import '../browse/ProductDetail.css'
 import { gql, useLazyQuery, useMutation } from '@apollo/client';
 import { useParams } from 'react-router-dom';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useLayoutEffect } from 'react';
 import { ADD_TO_CART } from '../../data/mutations/add-to-cart';
 import { GET_PRODUCTS } from '../../data/queries/get-products';
 import { customerId } from '../main/MainPage';
@@ -56,17 +56,16 @@ function ProductDetail() {
     arr.fill(false)
     arr[index] = true
     setPictureSelected(arr)
-
-  })
+  }, [])
 
   // Handle select color
-  const handleSelectColor = (index, color) => {
+  const handleSelectColor = useCallback((index, color) => {
     setColor(color.name)
     const arr = [...colorSelected]
     arr.fill(false)
     arr[index] = true
     setColorSelected(arr)
-  }
+  }, [])
 
   // Handle Add to cart event
   const handleSubmit = useCallback(() => {
@@ -84,6 +83,10 @@ function ProductDetail() {
     setColor("");
     setSize("");
   }, [Id, color, size, mutate, getProductDetail])
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0)
+  });
 
   if (mutateResult.loading) return <span>Loading...</span>
 
