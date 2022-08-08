@@ -94,25 +94,25 @@ function ItemInCart({
                 cart.map((item, index) => {
                     if (item.product) {
                         return (
-                            <div key={index} className="cart-item">
+                            <div key={index} className="checkout__cart-item">
                                 <input name={index} onChange={() => toggleCheck(index)} checked={checkedState[index]} className='item-checkbox' type="checkbox" />
-                                <div className="item-img">
+                                <div className="checkout__item-img">
                                     <img alt="Product" src={item.product.pictures[0]} />
                                 </div>
-                                <div className="item-detail">
+                                <div className="checkout__item-detail">
                                     <h5>{item.product.name}</h5>
-                                    <div className="item-variation">
+                                    <div className="checkout__item-variation">
                                         <p>{item.size}</p>
                                         <p>{item.color}</p>
                                     </div>
                                 </div>
-                                <div className="item-quantity-price">
-                                    <div className="quantity-buttons">
+                                <div className="checkout__item-quantity-price">
+                                    <div className="checkout__quantity-buttons">
                                         <button onClick={() => handleDecrease(index)}>-</button>
-                                        <p className="item-quantity">{quantity[index]}</p>
+                                        <p className="checkout__item-quantity">{quantity[index]}</p>
                                         <button onClick={() => handleIncrease(index)}>+</button>
                                     </div>
-                                    <h5 className="item-price">${productsPrice[index] * quantity[index]}</h5>
+                                    <h5 className="checkout__item-price">${productsPrice[index] * quantity[index]}</h5>
                                 </div>
                             </div>
                         )

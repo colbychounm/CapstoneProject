@@ -279,7 +279,7 @@ function CheckoutPage() {
                 <div className="checkoutpage">
                     <div className="checkout-body">
                         <div className="checkout-cart">
-                            <div className="cart-items">
+                            <div className="checkout__cart-items">
                                 <ItemInCart
                                     cart={cart}
                                     itemsInCart={itemsInCart}

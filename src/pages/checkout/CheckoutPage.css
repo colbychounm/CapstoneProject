@@ -18,7 +18,7 @@
     border-right: 1px solid #E6E6E6;
 }
 
-.cart-items {
+.checkout__cart-items {
     display       : flex;
     flex-direction: column;
     width         : 600px;
@@ -26,7 +26,7 @@
     border-bottom : 1px solid #E6E6E6;
 }
 
-.cart-item {
+.checkout__cart-item {
     display        : flex;
     justify-content: space-between;
     align-items    : center;
@@ -37,7 +37,7 @@
     margin-right: 20px;
 }
 
-.item-img {
+.checkout__item-img {
     display        : flex;
     justify-content: center;
     align-items    : center;
@@ -48,38 +48,38 @@
     border-radius  : 10px;
 }
 
-.item-img img {
+.checkout__item-img img {
     width: 90%;
 }
 
-.item-detail {
+.checkout__item-detail {
     flex: 1;
 }
 
-.item-variation {
+.checkout__item-variation {
     display    : flex;
     gap        : 20px;
     padding-top: 10px;
     font-size  : 12px;
 }
 
-.item-quantity-price {
+.checkout__item-quantity-price {
     display    : flex;
     align-items: center;
     gap        : 30px;
 }
 
-.item-price {
+.checkout__item-price {
     min-width: 50px;
 }
 
-.quantity-buttons {
+.checkout__quantity-buttons {
     display    : flex;
     align-items: center;
     gap        : 15px;
 }
 
-.quantity-buttons button {
+.checkout__quantity-buttons button {
     width           : 25px;
     height          : 25px;
     background-color: #E6E6E6;
@@ -87,41 +87,41 @@
     cursor          : pointer;
 }
 
-.quantity-buttons button:hover {
+.checkout__quantity-buttons button:hover {
     background-color: #a7a6a6;
 }
 
-.item-quantity {
+.checkout__item-quantity {
     min-width : 20px;
     font-size : 15px;
     text-align: center;
 }
 
 /* Checkout price */
-.cart-price {
+.checkout__cart-price {
     width: 600px;
 }
 
-.cart-subtotal {
+.checkout__cart-subtotal {
     padding      : 30px 0;
     border-bottom: 1px solid #E6E6E6;
 }
 
-.price-detail {
+.checkout__price-detail {
     display        : flex;
     justify-content: space-between;
     padding-bottom : 15px;
 }
 
-.price-detail:last-child {
+.checkout__price-detail:last-child {
     padding-bottom: 0;
 }
 
-.price-title {
+.checkout__price-title {
     font-size: 14px;
 }
 
-.cart-total {
+.checkout__cart-total {
     padding: 30px 0;
 }
 

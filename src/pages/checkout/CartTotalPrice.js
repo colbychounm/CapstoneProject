@@ -77,23 +77,23 @@ function CartTotalPrice({
     }, [subtotalPrice, tax, shipping])
 
     return (
-        <div className="cart-price">
-            <div className="cart-subtotal">
-                <div className="price-detail">
-                    <p className="price-title">Subtotal</p>
+        <div className="checkout__cart-price">
+            <div className="checkout__cart-subtotal">
+                <div className="checkout__price-detail">
+                    <p className="checkout__price-title">Subtotal</p>
                     <h5 className="price">${parseFloat(parseFloat(subtotalPrice).toFixed(2))}</h5>
                 </div>
-                <div className="price-detail">
-                    <p className="price-title">Shipping</p>
+                <div className="checkout__price-detail">
+                    <p className="checkout__price-title">Shipping</p>
                     <h5 className="price">${parseFloat(parseFloat(shipping).toFixed(2))}</h5>
                 </div>
-                <div className="price-detail">
-                    <p className="price-title">Tax</p>
+                <div className="checkout__price-detail">
+                    <p className="checkout__price-title">Tax</p>
                     <h5 className="price">${parseFloat(parseFloat(totalTax).toFixed(2))}</h5>
                 </div>
             </div>
-            <div className="cart-total">
-                <div className="price-detail">
+            <div className="checkout__cart-total">
+                <div className="checkout__price-detail">
                     <h3>Total</h3>
                     <h2>${parseFloat(total).toFixed(2)}</h2>
                 </div>
