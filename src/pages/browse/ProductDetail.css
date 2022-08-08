@@ -1,0 +1,81 @@
+/* Common */
+
+.fs-15 {
+    font-size: 15pt;
+}
+
+.mr-10 {
+    margin-right: 10px;
+}
+
+.border-1 {
+    border: 1px solid #000;
+}
+
+p {
+    font-size: 13pt;
+}
+
+
+/* Main */
+
+.product-detail-container {
+    display: flex;
+    flex-direction: row;
+}
+
+
+/* Product image list */
+
+.product-img-list {
+    display: flex;
+    width: 15%;
+    height: auto;
+    flex-direction: column;
+    /* justify-content: space-evenly; */
+    align-items: center;
+}
+
+.img-in-list {
+    width: 50%;
+    height: auto;
+    margin: 12px 0px;
+}
+
+.img-in-list:hover {
+    cursor: pointer;
+}
+
+
+/* Big image */
+
+.product-img-main {
+    width: 40%;
+    padding: 0px 10px;
+}
+
+.img-main {
+    width: 100%;
+}
+
+
+/* Product details */
+
+.product-details {
+    width: 45%;
+    padding: 0px 40px;
+}
+
+.detail-item {
+    margin: 20px 0px;
+}
+
+.input-features {
+    display: flex;
+    flex-direction: row;
+}
+
+.btn-detail {
+    height: 50px;
+    font-weight: bold;
+}
