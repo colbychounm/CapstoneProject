@@ -1,11 +1,12 @@
 import { useRef } from 'react';
 import './CheckoutPage.css';
 
-function CheckoutNav({ setIsCheckoutSuccess, isCartAvailable, setShowModal }) {
+function CheckoutNav({ setIsCheckoutSuccess, isCartAvailable, setShowSaveChangesModal }) {
 
     const checkoutRef = useRef();
     const checkoutButtonRef = useRef();
 
+    //Checkout and navigate to success page
     const handleCheckout = () => {
         if (isCartAvailable) {
             checkoutRef.current.setAttribute("href", "/checkout-success");
@@ -13,8 +14,9 @@ function CheckoutNav({ setIsCheckoutSuccess, isCartAvailable, setShowModal }) {
         }
     }
 
+    //Return to browse page
     const handleExitPage = () => {
-        setShowModal(true)
+        setShowSaveChangesModal(true)
     }
 
     return (

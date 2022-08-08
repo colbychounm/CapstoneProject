@@ -1,18 +1,13 @@
 import React, { useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { useLazyQuery, useMutation } from '@apollo/client';
 
 import './CheckoutPage.css';
-import { GET_CUSTOMER } from '../../data/queries/get-customer';
-import { MUTATION_CUSTOMER } from '../../data/mutations/update-customer';
 import { customerId } from '../main/MainPage';
 
-const CustomerForm = ({ setIsLocationUpdate }) => {
-    const [queryCustomer, { data }] = useLazyQuery(GET_CUSTOMER);
-    const [updateCustomer] = useMutation(MUTATION_CUSTOMER);
+const CustomerForm = ({ setIsLocationUpdate, queryCart, data, updateAllChanges }) => {
 
     useEffect(() => {
-        queryCustomer({
+        queryCart({
             variables: { customerCustomerId2: customerId }
         })
     }, [])
@@ -44,7 +39,7 @@ const CustomerForm = ({ setIsLocationUpdate }) => {
                 return errors;
             }}
             onSubmit={(values, { setSubmitting }) => {
-                updateCustomer({
+                updateAllChanges({
                     variables: {
                         customer: {
                             customerId: customerId,

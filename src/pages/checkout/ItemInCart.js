@@ -1,184 +1,22 @@
-import { useLazyQuery, useMutation } from '@apollo/client';
-import { useCallback, useEffect, useState } from 'react';
-
-import { GET_CART_ITEMS } from '../../data/queries/get-cart';
-import { GET_PRODUCT } from '../../data/queries/get-product';
-import { MUTATION_PRODUCT } from '../../data/mutations/update-product';
-import { MUTATION_CUSTOMER } from '../../data/mutations/update-customer';
-// import { EMPTY_CART } from '../../data/mutations/empty-cart';
 import CartTotalPrice from './CartTotalPrice';
-import { customerId } from '../main/MainPage';
+
+import { useEffect, useState } from 'react';
 
 function ItemInCart({
+    cart,
+    itemsInCart,
+    quantity,
+    productsPrice,
+    checkedState,
+    setCheckedState,
     isLocationUpdate,
     setIsLocationUpdate,
-    setIsCheckoutSuccess,
-    isCheckoutSuccess,
-    setShowRemoveItemModal,
-    showRemoveItemModal,
-    isItemRemoved,
-    setIsItemRemoved,
     setIsCartAvailable,
-    saveAllChanges }) {
-
-    let cartItem = {}
-    let cart = []
-
-    const [queryCart] = useLazyQuery(GET_CART_ITEMS);
-    const [queryProductInCart] = useLazyQuery(GET_PRODUCT);
-    const [updateProductStock] = useMutation(MUTATION_PRODUCT);
-    // const [emptyCart] = useMutation(EMPTY_CART)
-    const [updateAllChanges] = useMutation(MUTATION_CUSTOMER);
-
-    const [itemsInCart, setItemsInCart] = useState([]);
-    const [detailProducts, setDetailProducts] = useState([]);
-    const [quantity, setQuantity] = useState([]);
-    const [stock, setStock] = useState([]);
-    const [productsPrice, setProductsPrice] = useState([]);
+    stock,
+    setQuantity,
+    setShowRemoveItemModal,
+    setSelectIndex }) {
     const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
-    const [checkedState, setCheckedState] = useState([]);
-
-    // Query item in customer's cart and detail of product 
-    const queryCustomerCart = () => {
-        const promiseQueryCart = new Promise((resolve) => {
-            queryCart(
-                { variables: { customerCustomerId2: customerId } }
-            ).then(res => {
-                const resObj = {};
-                const data = res.data.customer.items;
-
-                let cartItem = {};
-                const cart = [];
-
-                const getCart = new Promise((resolve) => {
-                    data.forEach((item) => {
-                        cartItem = { ...item }
-                        cart.push(cartItem)
-                    })
-                    resolve(cart)
-                })
-                getCart.then(res => {
-                    res.forEach((item) => {
-                        if (!resObj[`${item.productId}` + `${item.color}` + `${item.size}`]) {
-                            resObj[`${item.productId}` + `${item.color}` + `${item.size}`] = []
-                        }
-                        resObj[`${item.productId}` + `${item.color}` + `${item.size}`].push(item)
-                    })
-                }).then(() => {
-                    const itemsArray = Object.values(resObj);
-
-                    const result = itemsArray.map((item) => {
-                        const res = item.reduce((prev, curr) => {
-                            return {
-                                ...curr,
-                                quantity: curr.quantity + prev.quantity
-                            }
-                        }, { quantity: 0 })
-                        return res
-                    })
-                    setItemsInCart(result)
-                    resolve(result)
-                })
-            })
-        })
-
-        promiseQueryCart.then(async (res) => {
-            //Query detail product in cart
-            //and get stock of products
-            //and get price of products
-            const newProducts = [];
-            const itemsStock = [];
-            const productsPrice = [];
-            for (const item of res) {
-                const { data } = await queryProductInCart({ variables: { productId: item.productId } })
-                newProducts.push(data.product)
-                itemsStock.push(data.product.stock)
-                productsPrice.push(data.product.price)
-            }
-            setDetailProducts(newProducts)
-            setStock(itemsStock)
-            setProductsPrice(productsPrice)
-
-            //Get quantity of items
-            const itemsQuantity = []
-            res.forEach((item) => {
-                itemsQuantity.push(item.quantity)
-            })
-            setQuantity(itemsQuantity)
-        })
-    }
-
-    //Create array of cartItem object that have detail product
-    if (itemsInCart) {
-        itemsInCart.forEach((item, index) => {
-            cartItem = { ...item, product: detailProducts[index] };
-            cart.push(cartItem);
-        })
-    }
-
-    //Query customer cart
-    useEffect(() => {
-        queryCustomerCart()
-    }, [])
-
-    //Decrease quantity of item
-    const handleDecrease = (index) => {
-        const newQuantityArray = [...quantity]
-
-        newQuantityArray[index]--
-        setQuantity(newQuantityArray)
-        if (newQuantityArray[index] <= 0) {
-            newQuantityArray[index] = 0;
-            setQuantity(newQuantityArray)
-            setShowRemoveItemModal(true)
-            if (showRemoveItemModal === false) {
-                //Remove item out of cart if quantity is set to 0 and customer click remove button
-                if (isItemRemoved === true) {
-                    console.log("here")
-                    const cartAfterRemove = [];
-                    cart.forEach((item, itemIndex) => {
-                        if (index !== itemIndex) {
-                            const itemInCartAfterRemove = {
-                                productId: item.productId,
-                                color: item.color,
-                                quantity: quantity[itemIndex]
-                            }
-                            cartAfterRemove.push(itemInCartAfterRemove)
-                        }
-
-                    })
-                    updateAllChanges({
-                        variables: {
-                            customer: {
-                                customerId: customerId,
-                                items: cartAfterRemove
-                            }
-                        }
-                    }).then(() => {
-                        queryCart({
-                            variables: { customerCustomerId2: customerId },
-                            // fetchPolicy: 'cache-and-network'
-                        })
-                    })
-                    setIsItemRemoved(false)
-                } else {
-                    newQuantityArray[index] = 1;
-                    setQuantity(newQuantityArray)
-                }
-            }
-        }
-    }
-
-    //Increase quantity of item
-    const handleIncrease = (index) => {
-        const newQuantityArray = [...quantity]
-        newQuantityArray[index]++
-        if (newQuantityArray[index] > stock[index]) {
-            newQuantityArray[index] = stock[index]
-            setQuantity(newQuantityArray)
-        }
-        setQuantity(newQuantityArray)
-    }
 
     //Set checked state after query items in cart
     useEffect(() => {
@@ -221,95 +59,30 @@ function ItemInCart({
         }
     }, [checkedState]);
 
-    //Checkout and edit product's stock
-    useEffect(() => {
-        if (isCheckoutSuccess) {
-            if (itemsInCart) {
-                const itemsCheckout = [];
-                const itemsRemainInCart = [];
-                const itemsCheckoutStock = [];
-                const itemsCheckoutQuantity = [];
-                const itemsRemainQuantity = [];
-
-                const handleUpdateStock = new Promise((resolve) => {
-                    checkedState.forEach((value, index) => {
-                        if (value === false) {
-                            itemsRemainInCart.push(itemsInCart[index]);
-                            itemsRemainQuantity.push(quantity[index])
-                        } else {
-                            itemsCheckout.push(itemsInCart[index]);
-                            itemsCheckoutStock.push(stock[index]);
-                            itemsCheckoutQuantity.push(quantity[index]);
-                        }
-                    })
-                    resolve([itemsRemainInCart, itemsRemainQuantity, itemsCheckout, itemsCheckoutStock, itemsCheckoutQuantity])
-                })
-                handleUpdateStock.then(res => {
-                    const itemsRemainInCart = res[0];
-                    const itemsRemainQuantity = res[1];
-                    const itemsCheckout = res[2];
-                    const itemsCheckoutStock = res[3];
-                    const itemsCheckoutQuantity = res[4];
-
-                    itemsCheckout.forEach(async (item, index) => {
-                        await updateProductStock({
-                            variables: {
-                                updateProductProduct2: {
-                                    id: item.productId,
-                                    stock: itemsCheckoutStock[index] - itemsCheckoutQuantity[index]
-                                }
-                            }
-                        })
-                    })
-                    return [itemsRemainInCart, itemsRemainQuantity]
-                }).then((res) => {
-                    const cartAfterSave = [];
-                    res[0].forEach((item, index) => {
-                        const itemInCartAfterSave = {
-                            productId: item.productId,
-                            color: item.color,
-                            size: item.size,
-                            quantity: res[1][index]
-                        }
-                        cartAfterSave.push(itemInCartAfterSave)
-                    })
-                    updateAllChanges({
-                        variables: {
-                            customer: {
-                                customerId: customerId,
-                                items: cartAfterSave
-                            },
-                        }
-                    })
-                })
-            }
+    //Increase quantity of item
+    const handleIncrease = (index) => {
+        const newQuantityArray = [...quantity]
+        newQuantityArray[index]++
+        if (newQuantityArray[index] > stock[index]) {
+            newQuantityArray[index] = stock[index]
+            setQuantity(newQuantityArray)
         }
-        setIsCheckoutSuccess(false)
-    }, [isCheckoutSuccess])
+        setQuantity(newQuantityArray)
+    }
 
-    //When customer try to exit checkout page, update all changes to customer's cart
-    useEffect(() => {
-        if (saveAllChanges) {
-            const cartAfterSave = [];
-            cart.forEach((item, index) => {
-                const itemInCartAfterSave = {
-                    productId: item.productId,
-                    color: item.color,
-                    size: item.size,
-                    quantity: quantity[index]
-                }
-                cartAfterSave.push(itemInCartAfterSave)
-            })
-            updateAllChanges({
-                variables: {
-                    customer: {
-                        customerId: customerId,
-                        items: cartAfterSave
-                    },
-                }
-            })
+    //Decrease quantity of item
+    const handleDecrease = (index) => {
+        setSelectIndex(index)
+        const newQuantityArray = [...quantity]
+
+        newQuantityArray[index]--
+        setQuantity(newQuantityArray)
+        if (newQuantityArray[index] <= 0) {
+            newQuantityArray[index] = 0;
+            setQuantity(newQuantityArray)
+            setShowRemoveItemModal(true)
         }
-    }, [saveAllChanges])
+    }
 
     return (
         <>
@@ -347,12 +120,12 @@ function ItemInCart({
                 })
             }
             <CartTotalPrice
-                productsPrice={productsPrice}
                 quantity={quantity}
+                productsPrice={productsPrice}
+                checkedState={checkedState}
                 isLocationUpdate={isLocationUpdate}
                 setIsLocationUpdate={setIsLocationUpdate}
                 setIsCartAvailable={setIsCartAvailable}
-                checkedState={checkedState}
             />
         </>
     )

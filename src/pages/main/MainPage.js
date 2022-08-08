@@ -12,7 +12,7 @@ import { useLazyQuery, useMutation } from '@apollo/client';
 export const customerId = localStorage.getItem("CustomerId");
 
 function MainPage() {
-    const [queryCustomer] = useLazyQuery(GET_CUSTOMER);
+    const [queryCustomer, { data }] = useLazyQuery(GET_CUSTOMER);
     const [updateCustomer] = useMutation(MUTATION_CUSTOMER);
 
     const [input, setInput] = useState('');
@@ -26,7 +26,6 @@ function MainPage() {
             alert("Welcome!")
         }, 500)
     }
-
     useEffect(() => {
         localStorage.setItem("CustomerId", customerId)
         queryCustomer({
