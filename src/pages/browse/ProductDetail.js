@@ -92,6 +92,8 @@ function ProductDetail() {
           }
         })
         alert("Added to your cart");
+        setColor("");
+        setSize("");
       }, [Id, color, size, mutate, getProductDetail])
 
     if (mutateResult.loading) return <span>Loading...</span>
