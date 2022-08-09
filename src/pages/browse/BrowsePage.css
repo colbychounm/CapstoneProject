@@ -1,46 +1,68 @@
 /* Main session */
 
 .browse-container {
-    display: flex;
+    display       : flex;
     flex-direction: row;
+    font-size     : 15px;
 }
 
 .sidebar {
-    position: sticky;
-    width: 20%;
-    display: flex;
+    position      : sticky;
+    width         : 20%;
+    display       : flex;
     flex-direction: column;
-    padding: 16px;
+    padding       : 16px;
 }
 
 .browse-mainpage {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    width          : 100%;
+    display        : flex;
+    flex-direction : row;
+    flex-wrap      : wrap;
     justify-content: space-evenly;
-    padding: 20px;
+    padding        : 20px;
 }
 
 
 /* Sidebar */
 
 .color-frame {
-    display: flex;
-    flex-direction: row;
+    display        : flex;
+    flex-direction : row;
     justify-content: space-around;
 }
 
 .search-input {
-    width: 100%;
-    height: 38px;
-    padding: 10px;
+    width    : 100%;
+    height   : 38px;
+    padding  : 10px;
     font-size: 12pt;
 }
 
 .color {
-    width: 28px;
-    height: 28px;
+    position: relative;
+    width   : 28px;
+    height  : 28px;
+    border  : 1px solid black;
+}
+
+.color .color-selected {
+    height         : 100%;
+    display        : flex;
+    justify-content: center;
+    align-items    : center;
+}
+
+.color-selected i {
+    background-color: black;
+    color           : white;
+    font-size       : 14px;
+    border          : 1px solid black;
+    border-radius   : 50%;
+}
+
+.color-nonselected {
+    display: none;
 }
 
 .color:hover {
@@ -68,7 +90,7 @@
 }
 
 .picture {
-    width: 100%;
+    width : 100%;
     height: auto;
 }
 
@@ -81,10 +103,10 @@
 }
 
 .product-select {
-    height: 42px;
-    width: 100%;
+    height   : 42px;
+    width    : 100%;
     font-size: 12pt;
-    padding: 10px;
+    padding  : 10px;
 }
 
 .range-input {
@@ -92,8 +114,8 @@
 }
 
 .price-range {
-    display: flex;
-    width: 100%;
+    display        : flex;
+    width          : 100%;
     justify-content: space-between;
 }
 
@@ -101,8 +123,8 @@
 /* Product list*/
 
 .product-card {
-    width: 320px;
-    height: fit-content;
+    width  : 320px;
+    height : fit-content;
     padding: 20px;
 }
 
@@ -115,18 +137,30 @@
 }
 
 .btn-add-to-card {
-    width: 100%;
-    padding: 8px;
-    margin-top: 12px;
+    width           : 100%;
+    padding         : 8px;
+    margin-top      : 12px;
     background-color: black;
-    color: white;
+    color           : white;
 }
 
 .btn-add-to-card:hover {
     opacity: 0.9;
-    cursor: pointer;
+    cursor : pointer;
 }
 
 .product-info {
+    height : 80px;
     padding: 0px 6px;
+}
+
+.product-info h4 {
+    padding-top: 10px;
+    font-size  : 16px;
+    line-height: 20px;
+}
+
+.product-info p {
+    padding-top: 7px;
+    font-size  : 15px;
 }

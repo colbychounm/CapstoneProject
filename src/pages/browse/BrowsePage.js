@@ -6,35 +6,9 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import '../browse/BrowsePage.css'
 import { Link, useHref, useNavigate } from "react-router-dom";
 import Slider from "@material-ui/core/Slider"
-
-const GET_PRODUCTS = gql`
- query {
-    products {
-      id
-      name
-      price
-      stock
-      colors {
-        name
-        hexValue
-      }
-      description
-      categories
-      pictures
-      sizes
-      featuringFrom
-      featuringTo
-    }
-  }
-`
-
-export const ADD_TO_CART = gql`
-    mutation AddItemToCart($customerId: ID!, $item: CartItemInput!) {
-        addItemToCart(customerId: $customerId, item: $item) {
-        id
-        }
-    }
-`
+import { GET_PRODUCTS } from '../../data/queries/get-products';
+import { ADD_TO_CART } from '../../data/mutations/add-to-cart';
+import { customerId } from '../main/MainPage';
 
 function BrowsePage() {
     // Add variables
@@ -46,6 +20,8 @@ function BrowsePage() {
     const [mutate, mutateResult] = useMutation(ADD_TO_CART)
     const navigate = useNavigate();
     const [getProducts, resultQuery] = useLazyQuery(GET_PRODUCTS)
+    let itemsSizeFilter = [];
+    let itemsColorFilter = []
 
     // Get list of Products
     useEffect(() => {
@@ -69,7 +45,7 @@ function BrowsePage() {
     const handleSubmit = useCallback((sz, clrs, id) => {
         mutate({
             variables: {
-                customerId: "Daisy-0601",
+                customerId: customerId,
                 item: {
                     productId: id,
                     color: clrs[0].name,
@@ -174,20 +150,35 @@ function BrowsePage() {
                         return item;
                     }
                 }).filter((item) => {
-                    let sz = "";
+                    let sz = [];
                     if (item.sizes != null) {
-                        sz = item.sizes[0];
+                        sz = item.sizes;
                     }
+                    console.log(sz)
                     if (size === "") {
                         return item;
-                    } else if (sz === size) {
-                        return item;
+                    } else if (size !== "") {
+                        sz.forEach((itemSize) => {
+                            if (size === itemSize) 
+                                itemsSizeFilter.push(item)
+                        })
+                        return itemsSizeFilter.includes(item)
                     }
                 }).filter((item) => {
+                    let clr;
+                    if (item.colors != null) {
+                        clr = item.colors;
+                    }
+
                     if (color === "") {
                         return item
-                    } else if (item.colors[0].name.toLowerCase() === color.toLowerCase()) {
-                        return item
+                    } else if (color !== "") {
+                        clr.forEach((itemColor) => {
+                            if (itemColor.name.toLowerCase() === color.toLowerCase()) {
+                                itemsColorFilter.push(item)
+                            }
+                        })
+                        return itemsColorFilter.includes(item)
                     }
                 }).filter((item) => {
                     if (item.price > priceRange[0] && item.price < priceRange[1]) {

@@ -63,6 +63,10 @@
     font-size  : 12px;
 }
 
+.checkout__item-variation p {
+    font-size: 12px;
+}
+
 .checkout__item-quantity-price {
     display    : flex;
     align-items: center;
