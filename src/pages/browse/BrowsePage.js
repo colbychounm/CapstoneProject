@@ -15,8 +15,10 @@ function BrowsePage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [priceRange, setPriceRange] = useState([0, 300]);
     const [category, setCategory] = useState("");
-    const [size, setSize] = useState("")
-    const [color, setColor] = useState("")
+    const [size, setSize] = useState("");
+    const [color, setColor] = useState("");
+    const [colorSelected, setColorSelected] = useState(new Array(6).fill(false));
+
     const [mutate, mutateResult] = useMutation(ADD_TO_CART)
     const navigate = useNavigate();
     const [getProducts, resultQuery] = useLazyQuery(GET_PRODUCTS)
@@ -56,6 +58,15 @@ function BrowsePage() {
         alert("Added to your cart");
         navigate("/customer")
     }, [mutate, getProducts])
+
+    // Handle select color
+    const handleSelectColor = useCallback((index, color) => {
+        setColor(color)
+        const arr = [...colorSelected]
+        arr.fill(false)
+        arr[index] = true
+        setColorSelected(arr)
+    }, [])
 
     if (mutateResult.loading) return <span>Loading...</span>
 
@@ -107,12 +118,24 @@ function BrowsePage() {
                 <div className="filter-item">
                     <h4>COLOR</h4>
                     <div className="color-frame">
-                        <img src="https://cdn-icons-png.flaticon.com/128/190/190446.png" alt="" className="color" onClick={() => { setColor("") }} />
-                        <div className="color color-black" onClick={() => { setColor("black") }}></div>
-                        <div className="color color-navy" onClick={() => { setColor("navy") }}></div>
-                        <div className="color color-grey" onClick={() => { setColor("grey") }}></div>
-                        <div className="color color-silver" onClick={() => { setColor("silver") }}></div>
-                        <div className="color color-white" onClick={() => { setColor("beige") }}></div>
+                        <div onClick={() => { handleSelectColor(0, "") }}>
+                            <img src="https://cdn-icons-png.flaticon.com/128/190/190446.png" alt="" className='color' />
+                        </div>
+                        <div className="color color-black" onClick={() => { handleSelectColor(1, "black") }}>
+                            <div className={colorSelected[1] ? "color-selected" : "color-nonselected"}><i className="fas fa-check-circle"></i></div>
+                        </div>
+                        <div className="color color-navy" onClick={() => { handleSelectColor(2, "navy") }}>
+                            <div className={colorSelected[2] ? "color-selected" : "color-nonselected"}><i className="fas fa-check-circle"></i></div>
+                        </div>
+                        <div className="color color-grey" onClick={() => { handleSelectColor(3, "grey") }}>
+                            <div className={colorSelected[3] ? "color-selected" : "color-nonselected"}><i className="fas fa-check-circle"></i></div>
+                        </div>
+                        <div className="color color-silver" onClick={() => { handleSelectColor(4, "silver") }}>
+                            <div className={colorSelected[4] ? "color-selected" : "color-nonselected"}><i className="fas fa-check-circle"></i></div>
+                        </div>
+                        <div className="color color-white" onClick={() => { handleSelectColor(5, "beige") }}>
+                            <div className={colorSelected[5] ? "color-selected" : "color-nonselected"}><i className="fas fa-check-circle"></i></div>
+                        </div>
                     </div>
                 </div>
 
@@ -150,7 +173,7 @@ function BrowsePage() {
                         return item;
                     }
                 }).filter((item) => {
-                    let sz = "";
+                    let sz = [];
                     if (item.sizes != null) {
                         sz = item.sizes;
                     }
@@ -165,7 +188,7 @@ function BrowsePage() {
                         return itemsSizeFilter.includes(item)
                     }
                 }).filter((item) => {
-                    let clr;
+                    let clr = [];
                     if (item.colors != null) {
                         clr = item.colors;
                     }
