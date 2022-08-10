@@ -177,12 +177,12 @@ function BrowsePage() {
                     if (item.sizes != null) {
                         sz = item.sizes;
                     }
-
+                    console.log(sz)
                     if (size === "") {
                         return item;
                     } else if (size !== "") {
                         sz.forEach((itemSize) => {
-                            if (size === itemSize)
+                            if (size === itemSize) 
                                 itemsSizeFilter.push(item)
                         })
                         return itemsSizeFilter.includes(item)

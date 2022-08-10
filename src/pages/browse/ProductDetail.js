@@ -69,6 +69,9 @@ function ProductDetail() {
 
   // Handle Add to cart event
   const handleSubmit = useCallback(() => {
+  if (color == "" || size == "") {
+    alert("You need to choose size and color");
+  } else {
     mutate({
       variables: {
         customerId: customerId,
@@ -82,6 +85,7 @@ function ProductDetail() {
     alert("Added to your cart");
     setColor("");
     setSize("");
+  }
   }, [Id, color, size, mutate, getProductDetail])
 
   useLayoutEffect(() => {
@@ -112,7 +116,6 @@ function ProductDetail() {
           <p className="fs-15 detail-item">${data.price}</p>
           <hr style={{ width: "90%", opacity: "0.5" }} />
         </div>
-
         <div>
           <h4 className="detail-item">DESCRIPTION</h4>
           <p className="detail-item">{data.description}</p>
